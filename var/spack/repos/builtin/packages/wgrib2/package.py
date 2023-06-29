@@ -81,6 +81,7 @@ class Wgrib2(MakefilePackage):
     variant("jasper", default=True, description="JPEG compression using Jasper")
     variant("openmp", default=True, description="OpenMP parallelization")
     variant("wmo_validation", default=False, description="WMO validation")
+    variant("checks", default=True, description="Enable make checks for dependencies")
 
     conflicts("+netcdf3", when="+netcdf4")
     conflicts("+openmp", when="%apple-clang")
@@ -144,6 +145,10 @@ class Wgrib2(MakefilePackage):
         # clang doesn"t understand --fast-math
         if spec.satisfies("%clang") or spec.satisfies("%apple-clang"):
             makefile.filter(r"--fast-math", "-ffast-math")
+
+        # make checks can exhaust /tmp in constrained environments
+        if spec.satisfies("~checks"):
+            makefile.filter(r"check install", "install")
 
         for variant_name, makefile_option in self.variant_map.items():
             value = int(spec.variants[variant_name].value)
