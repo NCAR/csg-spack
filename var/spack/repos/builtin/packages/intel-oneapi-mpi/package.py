@@ -5,6 +5,7 @@
 
 
 from spack.package import *
+from spack.util.environment import EnvironmentModifications
 
 
 @IntelOneApiPackage.update_description
@@ -139,6 +140,23 @@ class IntelOneapiMpi(IntelOneApiLibraryPackage):
             env.set("MPIFC", join_path(self.component_prefix.bin, "mpiifort"))
 
         env.set("I_MPI_ROOT", self.component_prefix)
+
+    def setup_run_environment(self, env):
+        # Only if environment modifications are desired (default is +envmods)
+        if "+envmods" in self.spec:
+            if "+external-libfabric" in self.spec:
+                env.extend(
+                    EnvironmentModifications.from_sourcing_file(
+                        join_path(self.component_prefix, "env", "vars.sh"),
+                        "-i_mpi_ofi_internal=0"
+                    )
+                )
+            else:
+                env.extend(
+                    EnvironmentModifications.from_sourcing_file(
+                        join_path(self.component_prefix, "env", "vars.sh")
+                    )
+                )
 
     @property
     def headers(self):
