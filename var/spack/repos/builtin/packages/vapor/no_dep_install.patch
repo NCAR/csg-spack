@@ -1,0 +1,23 @@
+--- a/CMakeLists.txt	2023-07-27 09:17:57.107848000 -0600
++++ b/CMakeLists.txt	2023-07-27 09:18:32.293073923 -0600
+@@ -588,13 +588,13 @@
+     set (CPACK_EXTERNAL_REQUESTED_VERSIONS "1.0")
+     set (CPACK_EXTERNAL_ENABLE_STAGING TRUE)
+ 
+-    if (NOT CONDA_BUILD)
+-	    install (
+-		    DIRECTORY ${THIRD_PARTY_DIR}/include
+-	        DESTINATION .
+-		    COMPONENT Dependencies
+-		)
+-    endif()
++    #if (NOT CONDA_BUILD)
++    #    install (
++    #	    DIRECTORY ${THIRD_PARTY_DIR}/include
++    #        DESTINATION .
++    #	    COMPONENT Dependencies
++    #	)
++    #endif()
+ endif ()
+ 
+ include (CPack)
