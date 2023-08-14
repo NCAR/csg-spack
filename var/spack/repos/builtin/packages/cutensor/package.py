@@ -8,6 +8,11 @@ import platform
 from spack.package import *
 
 _versions = {
+    "1.7.0.1": {
+        "Linux-x86_64": "dd3557891371a19e73e7c955efe5383b0bee954aba6a30e4892b0e7acb9deb26",
+        "Linux-ppc64le": "af4ad5e29dcb636f1bf941ed1fd7fc8053eeec4813fbc0b41581e114438e84c8",
+        "Linux-aarch64": "c31f8e4386539434a5d1643ebfed74572011783b4e21b62be52003e3a9de3720",
+    },
     # cuTensor 1.5.0
     "1.5.0.3": {
         "Linux-x86_64": "4fdebe94f0ba3933a422cff3dd05a0ef7a18552ca274dd12564056993f55471d",

@@ -28,6 +28,16 @@ class Gptl(AutotoolsPackage):
     variant("disable-unwind", default=False)
 
     depends_on("mpi")
+    depends_on("libunwind +debug_frame", when="~disable-unwind")
+
+    def flag_handler(self, name, flags):
+        if name == "fflags":
+            if self.compiler.name == "cce":
+                # Cray compiler generates module files with uppercase names by
+                # default, which is not handled by the makefile
+                flags.append("-ef")
+
+        return flags, None, None
 
     def configure_args(self):
         args = []
