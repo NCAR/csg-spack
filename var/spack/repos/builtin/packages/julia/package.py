@@ -54,13 +54,11 @@ class Julia(MakefilePackage):
     depends_on(
         "llvm"
         " targets=amdgpu,bpf,nvptx,webassembly"
-        " version_suffix=jl +link_llvm_dylib"
+        " version_suffix=jl +link_llvm_dylib libunwind=none"
     )
     depends_on("libuv", when="@:1.7")
     depends_on("libuv-julia@1.42.0", when="@1.8.0:1.8.1")
     depends_on("libuv-julia@1.44.2", when="@1.8.2:")
-
-    conflicts("^llvm+internal_unwind")
 
     with when("@1.9.0:1.9"):
         # libssh2.so.1, libpcre2-8.so.0, mbedtls.so.14, mbedcrypto.so.7, mbedx509.so.1
@@ -188,8 +186,7 @@ class Julia(MakefilePackage):
     depends_on("suite-sparse +pic")
     depends_on("unwind")
     depends_on("utf8proc")
-    #depends_on("zlib-api")
-    depends_on("zlib")
+    depends_on("zlib-api")
     depends_on("zlib +shared +pic +optimize", when="^zlib")
 
     # Patches for julia
@@ -265,7 +262,7 @@ class Julia(MakefilePackage):
         for pkg in pkgs:
             for dir in self.spec[pkg].libs.directories:
                 env.prepend_path(linker_var, dir)
-        for dir in self.spec["zlib"].libs.directories:
+        for dir in self.spec["zlib-api"].libs.directories:
             env.prepend_path(linker_var, dir)
 
     def edit(self, spec, prefix):
