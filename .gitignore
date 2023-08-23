@@ -513,10 +513,3 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-############################
-# NCAR fork ignores #
-############################
-
-share/ncar
-bin/clean_bash
