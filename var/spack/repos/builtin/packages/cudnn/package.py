@@ -301,11 +301,6 @@ class Cudnn(Package):
             ver = version[:4]
             cuda = version[4:]
             directory = "{0}/local_installers/{1}".format(directory, cuda)
-
-            # NOTE: starting with 8.5.0 NVIDIA no longer uses the full CUDA
-            # version in the tarball
-            if version >= Version("8.5.0"):
-                cuda = cuda[0]
         elif version >= Version("7.2"):
             directory = version[:3]
             ver = version[:4]
