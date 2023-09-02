@@ -101,7 +101,8 @@ class Ncl(Package):
     # ESMF is only required at runtime (for ESMF_regridding.ncl)
     # There might be more requirements to ESMF but at least the NetCDF support is required to run
     # the examples (see https://www.ncl.ucar.edu/Applications/ESMF.shtml)
-    depends_on("esmf+netcdf", type="run")
+    # Using an ESMF newer than 8.0 will cause failures
+    depends_on("esmf+netcdf@:8.0", type="run")
 
     # Some of the optional dependencies according to the manual:
     depends_on("hdf", when="+hdf4")
@@ -151,6 +152,15 @@ class Ncl(Package):
         exes = os.listdir(self.spec.prefix.bin)
         if "ncl" not in exes:
             raise RuntimeError("Installation failed (ncl executable was not created)")
+
+        # Change NCARG compiler wrappers to use real compiler, not Spack wrappers
+        with working_dir(self.spec.prefix.bin):
+            for wrapper in ["ncargcc", "nhlcc"]:
+                filter_file(spack_cc, self.compiler.cc, wrapper)
+            for wrapper in ["ncargf77", "nhlf77"]:
+                filter_file(spack_f77, self.compiler.f77, wrapper)
+            for wrapper in ["ncargf90", "nhlf90"]:
+                filter_file(spack_fc, self.compiler.fc, wrapper)
 
     def setup_run_environment(self, env):
         env.set("NCARG_ROOT", self.spec.prefix)
