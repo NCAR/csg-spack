@@ -78,6 +78,7 @@ class Visit(CMakePackage):
     variant("osmesa", default=False, description="Use OSMesa for off-screen CPU rendering")
     variant("adios2", default=True, description="Enable ADIOS2 file format")
     variant("hdf5", default=True, description="Enable HDF5 file format")
+    variant("netcdf", default=True, description="Enable NetCDF file format")
     variant("silo", default=True, description="Enable Silo file format")
     variant("python", default=True, description="Enable Python support")
     variant("mpi", default=True, description="Enable parallel engine")
@@ -94,6 +95,7 @@ class Visit(CMakePackage):
     patch("cmake-findvtkh-3.3.patch", when="@3.3.0:3.3.2+vtkm")
     patch("cmake-findjpeg.patch", when="@3.1.0:3.2.2")
     patch("cmake-findjpeg-3.3.patch", when="@3.3.0")
+    patch("cmake-findnccxx.patch", when="+netcdf")
 
     # Fix pthread and librt link errors
     patch("visit32-missing-link-libs.patch", when="@3.2")
@@ -137,6 +139,11 @@ class Visit(CMakePackage):
     depends_on("hdf5@1.8:", when="+hdf5")
     depends_on("hdf5+mpi", when="+hdf5+mpi")
     depends_on("hdf5~mpi", when="+hdf5~mpi")
+
+    # Enable netCDF library based on MPI variant and OLD C++ interface
+    depends_on("netcdf-c+mpi", when="+netcdf+mpi")
+    depends_on("netcdf-c~mpi", when="+netcdf~mpi")
+    depends_on("netcdf-cxx", when="+netcdf")
 
     # VisIt uses Silo's 'ghost zone' data structures, which are only available
     # in v4.10+ releases: https://wci.llnl.gov/simulation/computer-codes/silo/releases/release-notes-4.10
@@ -287,6 +294,14 @@ class Visit(CMakePackage):
             args.append(self.define("HDF5_DIR", spec["hdf5"].prefix))
             if "+mpi" in spec and "+mpi" in spec["hdf5"]:
                 args.append(self.define("VISIT_HDF5_MPI_DIR", spec["hdf5"].prefix))
+
+        if "+netcdf" in spec:
+            args.extend(
+                [
+                    self.define("NETCDF_DIR", spec["netcdf-c"].prefix),
+                    self.define("NETCDF_CXX_DIR", spec["netcdf-cxx"].prefix),
+                ]
+            )
 
         if "+silo" in spec:
             args.append(self.define("VISIT_SILO_DIR", spec["silo"].prefix))

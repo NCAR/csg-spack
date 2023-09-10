@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 
+import re
 from spack.package import *
 
 
@@ -30,7 +31,7 @@ class Vapor(CMakePackage):
     variant("doc", default=True, description="Build docs using Doxygen")
     variant("ospray", default=False, description="Enable OSPRay raytracing")
 
-    depends_on("cmake@3:", type="build")
+    depends_on("cmake@3.17:", type="build")
     depends_on("xz")
     depends_on("zlib")
     depends_on("openssl")
@@ -50,12 +51,13 @@ class Vapor(CMakePackage):
     depends_on("freetype")
     depends_on("proj@:8")
     depends_on("libgeotiff")
-    depends_on("libxinerama")
     depends_on("python+ssl")
     depends_on("py-numpy@1.21")
+    depends_on("py-scipy")
+    depends_on("py-matplotlib")
     depends_on("ospray~mpi", when="+ospray")
     depends_on("glm")
-    depends_on("qt+opengl+dbus")
+    depends_on("qt+opengl+dbus@5")
     depends_on("doxygen", when="+doc")
 
     # The build is designed to make a contained installer with
@@ -99,3 +101,13 @@ class Vapor(CMakePackage):
             targets.append("doc")
 
         return targets + ["all"]
+
+    # Vapor wants all of the Python packages in its build path. This
+    # somewhat objectionable code copies packages to the tree.
+    @run_after("install")
+    def copy_python_packages(self):
+        spec = self.spec
+        pp = re.compile("py-[a-z0-9-]*")
+
+        for pydep in pp.findall(str(spec)):
+            install_tree(spec[pydep].prefix.lib, prefix.lib)
