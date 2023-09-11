@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 
-import re
+import re, sys
 from spack.package import *
 
 
@@ -16,15 +16,15 @@ class Vapor(CMakePackage):
     """
 
     homepage = "https://www.vapor.ucar.edu"
-    url = "https://github.com/NCAR/VAPOR/archive/refs/tags/3.8.1.tar.gz"
+    url = "https://github.com/NCAR/VAPOR/archive/refs/tags/v3.9.0.tar.gz"
     git = "https://github.com/NCAR/VAPOR.git"
 
     maintainers("vanderwb")
 
     version("main", branch="main")
     version(
-        "3.8.1",
-        sha256="b7503665cfad6f66e38058209e46fd367f123c65aa53ba93862977826a0400aa",
+        "3.9.0",
+        sha256="343ababe40b5824ef826f16c935a6dc1fb18e1a4c88ef967c8d64386f28a99a3",
         preferred=True,
     )
 
@@ -49,28 +49,43 @@ class Vapor(CMakePackage):
     depends_on("netcdf-c~dap~byterange")
     depends_on("udunits")
     depends_on("freetype")
-    depends_on("proj@:8")
+    depends_on("proj@:7")
     depends_on("libgeotiff")
-    depends_on("python+ssl")
-    depends_on("py-numpy@1.21")
-    depends_on("py-scipy")
-    depends_on("py-matplotlib")
+    depends_on("python+ssl", type="build")
+    depends_on("py-numpy@1.21", type="build")
+    depends_on("py-scipy", type="build")
+    depends_on("py-matplotlib", type="build")
     depends_on("ospray~mpi", when="+ospray")
     depends_on("glm")
     depends_on("qt+opengl+dbus@5")
     depends_on("doxygen", when="+doc")
 
-    # The build is designed to make a contained installer with
-    # dependencies. This patch disables this behavior since dependencies
-    # will persist in Spack install tree
-    patch("no_dep_install.patch")
+    # These images are required but not provided by the source
+    resource(
+        name="map-images",
+        url="https://stratus.ucar.edu/vapor-images/2023-Jun-images.tar.xz",
+        sha256="3f0c6d40446abdb16d5aaaa314349a140e497b3be6f4971394b3e78f22d47c7d",
+        placement="share/extras/images",
+    )
 
     def cmake_args(self):
         spec = self.spec
+        tp_root = self.build_directory + "/third_party"
+        pyvers = spec["python"].version.up_to(2)
+        pypath = "{}/lib/python{}".format(tp_root, pyvers)
+
         args = [
             self.define_from_variant("BUILD_OSP", "ospray"),
             self.define_from_variant("BUILD_DOC", "doc"),
-            self.define("BUILD_PYTHON", True),
+            self.define("BUILD_PYTHON", False),
+            self.define("THIRD_PARTY_DIR", tp_root),
+            self.define("THIRD_PARTY_LIB_DIR", tp_root + "/lib"),
+            self.define("THIRD_PARTY_INC_DIR", tp_root + "/include"),
+            self.define("PYTHONVERSION", pyvers),
+            self.define("PYTHONDIR", spec.prefix),
+            self.define("PYTHONPATH", pypath),
+            self.define("NUMPY_INCLUDE_DIR", pypath + "/site-packages/numpy/core/include"),
+            self.define("MAP_IMAGES_PATH", "extras/images"),
             ]
 
         return args
@@ -90,6 +105,22 @@ class Vapor(CMakePackage):
     @run_before("cmake")
     def clean_local_refs(self):
         force_remove("site_files/site.NCAR")
+
+    # Vapor wants all of the Python packages in its build path. This
+    # somewhat objectionable code copies packages to the tree. It also
+    # copies the Python library so that the site-library is found.
+    @run_before("cmake")
+    def copy_python_library(self):
+        spec = self.spec
+        tp_root = self.build_directory + "/third_party"
+        mkdirp(tp_root)
+        pp = re.compile("py-[a-z0-9-]*")
+
+        for pydep in ["python"] + pp.findall(str(spec)):
+            install_tree(spec[pydep].prefix, tp_root)
+
+        # We also need to modify RPATH'ing so final binaries don't
+        # use Python at its original prefix
     
     # The documentation will not be built without this target (though
     # it will try to install!)
@@ -102,12 +133,7 @@ class Vapor(CMakePackage):
 
         return targets + ["all"]
 
-    # Vapor wants all of the Python packages in its build path. This
-    # somewhat objectionable code copies packages to the tree.
+    # Finally, let's move the third_party library to the install prefix
     @run_after("install")
-    def copy_python_packages(self):
-        spec = self.spec
-        pp = re.compile("py-[a-z0-9-]*")
-
-        for pydep in pp.findall(str(spec)):
-            install_tree(spec[pydep].prefix.lib, prefix.lib)
+    def move_tp_library(self):
+        install_tree(self.build_directory + "/third_party/lib", self.spec.prefix.lib)
