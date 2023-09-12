@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 
-import re, sys
+import re
 from spack.package import *
 
 
@@ -70,17 +70,16 @@ class Vapor(CMakePackage):
 
     def cmake_args(self):
         spec = self.spec
-        tp_root = self.build_directory + "/third_party"
         pyvers = spec["python"].version.up_to(2)
-        pypath = "{}/lib/python{}".format(tp_root, pyvers)
+        pypath = "{}/python{}".format(spec.prefix.lib, pyvers)
 
         args = [
             self.define_from_variant("BUILD_OSP", "ospray"),
             self.define_from_variant("BUILD_DOC", "doc"),
             self.define("BUILD_PYTHON", False),
-            self.define("THIRD_PARTY_DIR", tp_root),
-            self.define("THIRD_PARTY_LIB_DIR", tp_root + "/lib"),
-            self.define("THIRD_PARTY_INC_DIR", tp_root + "/include"),
+            self.define("THIRD_PARTY_DIR", spec.prefix),
+            self.define("THIRD_PARTY_LIB_DIR", spec.prefix.lib),
+            self.define("THIRD_PARTY_INC_DIR", spec["python"].prefix.include),
             self.define("PYTHONVERSION", pyvers),
             self.define("PYTHONDIR", spec.prefix),
             self.define("PYTHONPATH", pypath),
@@ -112,16 +111,12 @@ class Vapor(CMakePackage):
     @run_before("cmake")
     def copy_python_library(self):
         spec = self.spec
-        tp_root = self.build_directory + "/third_party"
-        mkdirp(tp_root)
+        mkdirp(spec.prefix.lib)
         pp = re.compile("py-[a-z0-9-]*")
 
         for pydep in ["python"] + pp.findall(str(spec)):
-            install_tree(spec[pydep].prefix, tp_root)
+            install_tree(spec[pydep].prefix.lib, spec.prefix.lib)
 
-        # We also need to modify RPATH'ing so final binaries don't
-        # use Python at its original prefix
-    
     # The documentation will not be built without this target (though
     # it will try to install!)
     @property
@@ -132,8 +127,3 @@ class Vapor(CMakePackage):
             targets.append("doc")
 
         return targets + ["all"]
-
-    # Finally, let's move the third_party library to the install prefix
-    @run_after("install")
-    def move_tp_library(self):
-        install_tree(self.build_directory + "/third_party/lib", self.spec.prefix.lib)
