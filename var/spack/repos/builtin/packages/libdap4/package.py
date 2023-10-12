@@ -35,7 +35,8 @@ class Libdap4(AutotoolsPackage):
     depends_on("rpc")
 
     def setup_build_environment(self, env):
-        with when("^libtirpc"):
+        # Configure script can insert library path here, resulting in a failure
+        if self.spec.satisfies("^libtirpc"):
             env.set("TIRPC_LIBS", "-ltirpc")
 
     def configure_args(self):

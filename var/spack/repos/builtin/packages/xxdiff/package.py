@@ -16,8 +16,8 @@ class Xxdiff(MakefilePackage):
 
     version("latest", branch = "master")
 
-    depends_on("flex@2.5.31:")
-    depends_on("bison")
+    depends_on("flex@2.5.31:", type="build")
+    depends_on("bison", type="build")
     depends_on("qt@5:", type=("build", "link", "run"))
 
     def edit(self, spec, prefix):

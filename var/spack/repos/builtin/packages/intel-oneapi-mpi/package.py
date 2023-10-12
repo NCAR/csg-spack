@@ -112,6 +112,13 @@ class IntelOneapiMpi(IntelOneApiLibraryPackage):
     def component_dir(self):
         return "mpi"
 
+    @property
+    def env_script_args(self):
+        if "+external-libfabric" in self.spec:
+            return ("-i_mpi_ofi_internal=0",)
+        else:
+            return ()
+
     def setup_dependent_package(self, module, dep_spec):
         if "+generic-names" in self.spec:
             self.spec.mpicc = join_path(self.component_prefix.bin, "mpicc")
@@ -146,23 +153,6 @@ class IntelOneapiMpi(IntelOneApiLibraryPackage):
             env.set("MPIFC", join_path(self.component_prefix.bin, "mpiifort"))
 
         env.set("I_MPI_ROOT", self.component_prefix)
-
-    def setup_run_environment(self, env):
-        # Only if environment modifications are desired (default is +envmods)
-        if "+envmods" in self.spec:
-            if "+external-libfabric" in self.spec:
-                env.extend(
-                    EnvironmentModifications.from_sourcing_file(
-                        join_path(self.component_prefix, "env", "vars.sh"),
-                        "-i_mpi_ofi_internal=0"
-                    )
-                )
-            else:
-                env.extend(
-                    EnvironmentModifications.from_sourcing_file(
-                        join_path(self.component_prefix, "env", "vars.sh")
-                    )
-                )
 
     @property
     def headers(self):

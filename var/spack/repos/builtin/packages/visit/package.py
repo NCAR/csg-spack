@@ -95,7 +95,6 @@ class Visit(CMakePackage):
     patch("cmake-findvtkh-3.3.patch", when="@3.3.0:3.3.2+vtkm")
     patch("cmake-findjpeg.patch", when="@3.1.0:3.2.2")
     patch("cmake-findjpeg-3.3.patch", when="@3.3.0")
-    patch("cmake-findnccxx.patch", when="+netcdf")
 
     # Fix pthread and librt link errors
     patch("visit32-missing-link-libs.patch", when="@3.2")
@@ -191,6 +190,11 @@ class Visit(CMakePackage):
         # VTK's module flies (e.g. lib/cmake/vtk-8.1/Modules/vtktiff.cmake)
         for filename in find("src", "CMakeLists.txt"):
             filter_file(r"\bvtk(tiff|jpeg|png)", r"${vtk\1_LIBRARIES}", filename)
+
+        # NetCDF components are in separate directories using Spack, which is
+        # not what Visit's CMake logic expects
+        if "+netcdf" in self.spec:
+            filter_file("(set\(NETCDF_CXX_DIR)", r"#\1", "src/CMake/FindNetcdf.cmake")
 
     def flag_handler(self, name, flags):
         if name in ("cflags", "cxxflags"):
