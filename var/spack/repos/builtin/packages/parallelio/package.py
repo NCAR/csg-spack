@@ -39,7 +39,7 @@ class Parallelio(CMakePackage):
     variant("mpi", default=True, description="Use mpi to build, otherwise use mpi-serial")
 
     # This patch addresses building pio2.6.1 with serial netcdf, the issue is netcdf filters
-    patch("serial261.patch", when="@2.6.1 ~mpi")
+    patch("serial261.patch", when="@2.6.1")
     patch("remove_redefinition_of_mpi_offset.patch", when="@:2.5.6")
 
     # This patch addresses an issue when compiling pio2.6.0 with a serial netcdf library.
@@ -55,6 +55,11 @@ class Parallelio(CMakePackage):
     depends_on("parallel-netcdf", type="link", when="+pnetcdf")
 
     resource(name="genf90", git="https://github.com/PARALLELIO/genf90.git", tag="genf90_200608")
+    resource(
+        name="CMake_Fortran_utils",
+        git="https://github.com/CESM-Development/CMake_Fortran_utils.git",
+        tag="CMake_Fortran_utils_150308",
+    )
 
     # Allow argument mismatch in gfortran versions > 10 for mpi library compatibility
     patch("gfortran.patch", when="@:2.5.8 +fortran %gcc@10:")

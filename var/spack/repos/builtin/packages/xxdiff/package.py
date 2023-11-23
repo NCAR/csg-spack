@@ -14,14 +14,15 @@ class Xxdiff(MakefilePackage):
 
     maintainers("vanderwb")
 
-    version("latest", branch = "master")
+    version("master", branch="master")
+    version("2023-01-10", commit="604300ea9875611726ba885fb14f872b964df579")
 
     depends_on("flex@2.5.31:", type="build")
     depends_on("bison", type="build")
     depends_on("qt@5:", type=("build", "link", "run"))
 
     def edit(self, spec, prefix):
-        env['QMAKE'] = 'qmake'
+        env["QMAKE"] = "qmake"
 
     def build(self, spec, prefix):
         with working_dir("src"):
@@ -31,4 +32,4 @@ class Xxdiff(MakefilePackage):
 
     def install(self, spec, prefix):
         mkdir(prefix.bin)
-        install('bin/xxdiff', prefix.bin)
+        install("bin/xxdiff", prefix.bin)
