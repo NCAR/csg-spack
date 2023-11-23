@@ -172,7 +172,6 @@ class Julia(MakefilePackage):
 
     depends_on("blas")  # note: for now openblas is fixed...
     depends_on("curl tls=mbedtls +nghttp2 +libssh2")
-    depends_on("cmake")
     depends_on("dsfmt@2.2.4:")  # apparently 2.2.3->2.2.4 breaks API
     depends_on("gmp")
     depends_on("lapack")  # note: for now openblas is fixed...
