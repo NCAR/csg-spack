@@ -56,7 +56,7 @@ class HdfEos5(AutotoolsPackage):
 
     # Build dependencies
     depends_on("hdf5+hl")
-
+    
     # The standard Makefile.am, etc. add a --single_module flag to LDFLAGS
     # to pass to the linker.
     # That appears to be only recognized by the Darwin linker, remove it
@@ -77,14 +77,20 @@ class HdfEos5(AutotoolsPackage):
                 "version/checksum not found in version_list".format(version)
             )
 
+    @run_before("configure")
+    def fix_configure(self):
+        chmod = which("chmod")
+        chmod("u+w", "configure")
+
+        # The configure script as written really wants you to use h5cc. This causes
+        # problems because h5cc differs when HDF5 is built with autotools vs cmake,
+        # and we lose all nice flags from the Spack wrappers. These filter operations
+        # allow use to use the Spack wrappers again.
+        filter_file("\$CC -show &> /dev/null", "true", "configure")
+        filter_file("CC=./\$SZIP_CC", "", "configure")
+
     def configure_args(self):
         extra_args = []
-
-        # Package really wants h5cc to be used
-        if self.spec["mpi"]:
-            extra_args.append("CC={0}/bin/h5pcc -Df2cFortran".format(self.spec["hdf5"].prefix))
-        else:
-            extra_args.append("CC={0}/bin/h5cc -Df2cFortran".format(self.spec["hdf5"].prefix))
 
         # We always build PIC code
         extra_args.append("--with-pic")
@@ -101,5 +107,7 @@ class HdfEos5(AutotoolsPackage):
             extra_args.append("--with-szlib={0}".format(self.spec["szip"].prefix))
         if "zlib-api" in self.spec:
             extra_args.append("--with-zlib={0}".format(self.spec["zlib-api"].prefix))
+
+        #extra_args.append("LDFLAGS=-Wl,-rpath,{}".format(self.spec["hdf5"].libs.directories[0]))
 
         return extra_args
