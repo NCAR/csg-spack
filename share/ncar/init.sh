@@ -17,5 +17,14 @@ fi
 # If left set, will contaminate Spack child shells
 unset BASH_ENV
 
+# Config to use non-system core compiler
+CORE_GCC_ROOT=
+
+if [[ -n $CORE_GCC_ROOT ]]; then
+    export PATH=$CORE_GCC_ROOT/bin:$PATH
+    export LIBRARY_PATH=$CORE_GCC_ROOT/lib64${LIBRARY_PATH:+:$LIBRARY_PATH}
+    export LD_LIBRARY_PATH=$CORE_GCC_ROOT/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+fi
+
 # Initialize Bash Spack shell integration
 . $NCAR_SPACK_STARTUP
