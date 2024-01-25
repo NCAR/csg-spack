@@ -37,7 +37,6 @@ class Vapor(CMakePackage):
     depends_on("openssl")
     depends_on("expat")
     depends_on("curl")
-    depends_on("which")
     depends_on("mesa-glu")
     depends_on("gl")
     depends_on("libxtst")
