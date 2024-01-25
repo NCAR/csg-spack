@@ -113,8 +113,9 @@ class PyCartopy(PythonPackage):
         # Needed for `spack install --test=root py-cartopy`
         library_dirs = []
         for dep in self.spec.dependencies(deptype="link"):
-            query = self.spec[dep.name]
-            library_dirs.extend(query.libs.directories)
+            if dep.name != "py-numpy":
+                query = self.spec[dep.name]
+                library_dirs.extend(query.libs.directories)
 
         # Cartopy uses ctypes.util.find_library, which searches LD_LIBRARY_PATH
         # Our RPATH logic works fine, but the unit tests fail without this

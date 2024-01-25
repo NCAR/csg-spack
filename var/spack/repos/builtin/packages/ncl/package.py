@@ -6,6 +6,7 @@
 import glob
 import os
 import tempfile
+import sys
 
 from spack.package import *
 
@@ -107,8 +108,7 @@ class Ncl(Package):
     # ESMF is only required at runtime (for ESMF_regridding.ncl)
     # There might be more requirements to ESMF but at least the NetCDF support is required to run
     # the examples (see https://www.ncl.ucar.edu/Applications/ESMF.shtml)
-    # Using an ESMF newer than 8.0 will cause failures
-    depends_on("esmf+netcdf@:8.0", type="run")
+    depends_on("esmf+netcdf", type="run")
 
     # Some of the optional dependencies according to the manual:
     depends_on("hdf", when="+hdf4")
@@ -169,10 +169,10 @@ class Ncl(Package):
         f90_wrappers = ["ncargf90", "nhlf90"]
         lib_paths = []
 
-        for dep in ["cairo", "libx11"]:
-            lib_paths.append(self.spec[dep].prefix.lib)
+        for dep in spec.dependencies(deptype="link"):
+            lib_paths.append(spec[dep.name].prefix.lib)
 
-        with working_dir(self.spec.prefix.bin):
+        with working_dir(spec.prefix.bin):
             # Change NCARG compiler wrappers to use real compiler, not Spack wrappers
             for wrapper in c_wrappers:
                 filter_file(spack_cc, self.compiler.cc, wrapper)
@@ -188,23 +188,19 @@ class Ncl(Package):
                     r'\1 "{}"'.format(" ".join(["-L{}".format(p) for p in lib_paths])),
                     wrapper,
                 )
-                filter_file(
-                    "^(set cairolib[ ]*=).*",
-                    r'\1 "-lcairo"',
-                    wrapper,
-                )
+                filter_file("^(set cairolib[ ]*=).*", r'\1 "-lcairo -lfreetype"', wrapper)
 
     def setup_run_environment(self, env):
         env.set("NCARG_ROOT", self.spec.prefix)
 
         # We cannot rely on Spack knowledge of esmf when NCL is an external
-        if self.spec.satisfies("^esmf"):
+        if not self.spec.external:
             env.set("ESMFBINDIR", self.spec["esmf"].prefix.bin)
 
     def prepare_site_config(self):
-        fc_flags = []
-        cc_flags = []
-        c2f_flags = []
+        fc_flags = [self.compiler.fc_pic_flag]
+        cc_flags = [self.compiler.cc_pic_flag]
+        c2f_flags = [self.compiler.cc_pic_flag]
 
         if "+openmp" in self.spec:
             fc_flags.append(self.compiler.openmp_flag)
@@ -227,11 +223,6 @@ class Ncl(Package):
             fc_flags.append("-fallow-argument-mismatch")
             cc_flags.append("-fcommon")
 
-        if self.spec.satisfies("+byteswapped"):
-            bytelines = "#define StdDefines -DByteSwapped\n#define ByteSwapped\n"
-        else:
-            bytelines = ""
-
         if self.spec.satisfies("+grib"):
             gribline = (
                 "#define GRIB2lib %s/external/g2clib-1.6.0/libgrib2c.a -ljasper -lpng -lz -ljpeg\n"
@@ -244,7 +235,7 @@ class Ncl(Package):
             f.writelines(
                 [
                     "#define HdfDefines\n",
-                    bytelines,
+                    "#define StdDefines -DByteSwapped\n#define ByteSwapped\n" if self.spec.satisfies("+byteswapped") else "",
                     "#define CppCommand '/usr/bin/env cpp -traditional'\n",
                     "#define CCompiler {0}\n".format(spack_cc),
                     "#define FCompiler {0}\n".format(spack_fc),
@@ -384,9 +375,7 @@ class Ncl(Package):
                 replace_str = "\n#define HDFlib {} {}".format(hdf4.libs.link_flags, replace_str)
 
             filter_file(
-                "({})".format(search_str),
-                r"\1 " + "{}".format(replace_str),
-                "config/Site.local",
+                "({})".format(search_str), r"\1 " + "{}".format(replace_str), "config/Site.local"
             )
 
     def prepare_src_tree(self):

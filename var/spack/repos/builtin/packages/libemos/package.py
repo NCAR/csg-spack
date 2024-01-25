@@ -43,6 +43,16 @@ class Libemos(CMakePackage):
 
     conflicts("grib=eccodes", when="@:4.4.1", msg="Eccodes is supported starting version 4.4.2")
 
+    def flag_handler(self, name, flags):
+        flags = []
+
+        if name == "ldlibs":
+            if self.spec.satisfies("grib=eccodes"):
+                flags.append("-leccodes")
+                flags.append("-leccodes_f90")
+
+        return (flags, None, None)
+
     def cmake_args(self):
         args = []
 
@@ -53,6 +63,11 @@ class Libemos(CMakePackage):
                 args.append("-DENABLE_ECCODES=OFF")
 
         # To support long pathnames that spack generates
-        args.append("-DCMAKE_Fortran_FLAGS=-ffree-line-length-none")
+        fflags = ["-ffree-line-length-none"]
+
+        if self.spec.satisfies("%gcc@10:"):
+            fflags.append("-fallow-argument-mismatch")
+
+        args.append("-DCMAKE_Fortran_FLAGS='{}'".format(" ".join(fflags)))
 
         return args
