@@ -34,10 +34,6 @@ class MpiSerial(AutotoolsPackage):
         description="Specify the size of Fortran double precision variables",
     )
 
-    depends_on("autoconf", type="build", when="@2.5.0")
-    depends_on("automake", type="build", when="@2.5.0")
-    depends_on("libtool",  type="build", when="@2.5.0")
-
     provides("mpi")
 
     def flag_handler(self, name, flags):

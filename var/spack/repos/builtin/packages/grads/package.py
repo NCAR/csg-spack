@@ -15,7 +15,7 @@ class Grads(AutotoolsPackage):
     HDF (version 4 and 5), and BUFR (for station data)."""
 
     homepage = "http://cola.gmu.edu/grads/grads.php"
-    
+
     maintainers("vanderwb")
 
     version("2.2.3", sha256="2cbb67284fe64763c589ecaf08d5bd31144554dfd82a1fccf71e1cc424695a9e")
@@ -26,7 +26,7 @@ class Grads(AutotoolsPackage):
     variant("shapefile", default=True, description="Enable Shapefile support")
     variant("grib2", default=True, description="Enable GRIB2 support")
     variant("dap", default=False, description="Enable DAP support")
-    
+
     # TODO: This variant depends on the "simple X" library, which is no longer available
     # from any trusted source. Revisit if this changes.
     # variant("gui", default=False, description="Enable graphical user interface")
@@ -36,7 +36,7 @@ class Grads(AutotoolsPackage):
     variant("hdf5", default=True, when="@2.2.2:", description="Enable HDF5 support")
     variant("hdf4", default=True, when="@2.2.2:", description="Enable HDF4 support")
     variant("netcdf", default=True, when="@2.2.2:", description="Enable NetCDF support")
-    
+
     depends_on("hdf5@:1.10", when="+hdf5")
     depends_on("hdf", when="+hdf4")
     depends_on("netcdf-c", when="+netcdf")
@@ -72,7 +72,7 @@ class Grads(AutotoolsPackage):
         # Recent versions configure scripts break without PKG_CONFIG set
         env.set("PKG_CONFIG", self.spec["pkgconfig"].prefix.bin.join("pkg-config"))
 
-        if self.spec.satisfies("+hdf4") and self.spec["hdf"].satisfies("~shared"):
+        if "+hdf4" in self.spec and "~shared" in self.spec["hdf"]:
             env.set("LIBS", self.spec["hdf:transitive"].libs)
 
     def setup_run_environment(self, env):
