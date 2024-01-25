@@ -315,9 +315,9 @@ class LmodFileLayout(BaseFileLayout):
         # we need to append a hash to the version to distinguish
         # among flavors of the same library (e.g. openblas~openmp vs.
         # openblas+openmp)
+        
         # BJV - actually don't do this
-        #return f"{path_part_fmt(token=value)}-{value.dag_hash(length=7)}"
-        return f"{path_part_fmt(token=value)}"
+        return f"{path_part_fmt(token=value)}" #-{value.dag_hash(length=7)}"
 
     @property
     def available_path_parts(self):

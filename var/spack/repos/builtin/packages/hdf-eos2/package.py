@@ -121,9 +121,3 @@ class HdfEos2(AutotoolsPackage):
             extra_args.append("--with-zlib={0}".format(self.spec["zlib-api"].prefix))
 
         return extra_args
-
-    # No headers are installed, but some dependencies will need them
-    @run_after("install")
-    def copy_headers(self):
-        mkdirp(self.spec.prefix.include)
-        install("include/*.h", self.spec.prefix.include)
