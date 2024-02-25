@@ -52,6 +52,9 @@ class MpiSerial(AutotoolsPackage):
                 config_flags.append("-Wno-error=implicit-function-declaration")
         elif name == "fflags":
             config_flags.append(self.compiler.fc_pic_flag)
+            if spec.satisfies("%cce"):
+                # Makefile expects "mpi.mod", not "MPI.mod"
+                config_flags.append("-ef")
 
         return flags, None, (config_flags or None)
 
@@ -75,5 +78,3 @@ class MpiSerial(AutotoolsPackage):
         install("mpif.h", prefix.include)
         if os.path.isfile("mpi.mod"):
             install("mpi.mod", prefix.include)
-        if os.path.isfile("MPI.mod"):
-            install("MPI.mod", prefix.include)
