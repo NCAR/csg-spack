@@ -26,5 +26,12 @@ if [[ -n $CORE_GCC_ROOT ]]; then
     export LD_LIBRARY_PATH=$CORE_GCC_ROOT/lib64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 fi
 
+# Config to use specific Python with Spack
+NCAR_SPACK_PYTHON_ROOT=/glade/work/csgteam/condaenvs/spack-utils
+
+if [[ -e $NCAR_SPACK_PYTHON_ROOT/bin/python ]]; then
+    export SPACK_PYTHON=$NCAR_SPACK_PYTHON_ROOT/bin/python
+fi
+
 # Initialize Bash Spack shell integration
 . $NCAR_SPACK_STARTUP

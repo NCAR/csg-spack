@@ -25,6 +25,8 @@ class Mvapich(AutotoolsPackage):
     executables = ["^mpiname$", "^mpichversion$"]
 
     # Prefer the latest stable release
+    version("3.0", sha256="ee076c4e672d18d6bf8dd2250e4a91fa96aac1db2c788e4572b5513d86936efb",
+            preferred = True)
     version("3.0rc", sha256="a0cd69ca810c48cf75a0dc6fee36dc2e583ffadc13c96dc40e3ea8abcb1f7609")
     version("3.0b", sha256="52d8a742e16eef69e944754fea7ebf8ba4ac572dac67dbda528443d9f32547cc")
 
@@ -37,6 +39,8 @@ class Mvapich(AutotoolsPackage):
     variant("cuda", default=False, description="Enable CUDA extension")
 
     variant("regcache", default=True, description="Enable memory registration cache")
+
+    variant("pbs", default=False, description="Build with support for PBS")
 
     # Accepted values are:
     #   single      - No threads (MPI_THREAD_SINGLE)
@@ -107,6 +111,7 @@ class Mvapich(AutotoolsPackage):
     depends_on("cuda", when="+cuda")
     depends_on("libfabric", when="netmod=ofi")
     depends_on("slurm", when="process_managers=slurm")
+    depends_on("openpbs", when="+pbs")
     depends_on("ucx", when="netmod=ucx")
 
     with when("process_managers=slurm"):
@@ -188,13 +193,24 @@ class Mvapich(AutotoolsPackage):
 
         return opts
 
+    # The configure script thinks that nvhpc can support the necessary Fortran 2008
+    # features, but it cannot. This patch allows us to get Fortran 90 support without
+    # the Fortran 2008 support, which it typically wants to bundle together.
+    def patch(self):
+        if self.spec.satisfies("%nvhpc"):
+            filter_file("f08_works=yes", "f08_works=no", "configure")
+
     def flag_handler(self, name, flags):
+        if flags is None:
+            flags = []
+
         if name == "fflags":
             # https://bugzilla.redhat.com/show_bug.cgi?id=1795817
             if self.spec.satisfies("%gcc@10:"):
-                if flags is None:
-                    flags = []
                 flags.append("-fallow-argument-mismatch")
+        elif name == "cppflags":
+            if self.spec.satisfies("%nvhpc"):
+                flags.append("-noswitcherror")
 
         return (flags, None, None)
 
@@ -202,7 +218,7 @@ class Mvapich(AutotoolsPackage):
         # mvapich2 configure fails when F90 and F90FLAGS are set
         env.unset("F90")
         env.unset("F90FLAGS")
-
+        
     def setup_run_environment(self, env):
         env.set("MPI_ROOT", self.prefix)
 
@@ -266,13 +282,14 @@ class Mvapich(AutotoolsPackage):
         args = [
             "--enable-shared",
             "--enable-romio",
+            "--enable-fortran=all",
             "--disable-silent-rules",
             "--disable-new-dtags",
-            "--enable-fortran=all",
             "--enable-threads={0}".format(spec.variants["threads"].value),
             "--with-ch3-rank-bits={0}".format(spec.variants["ch3_rank_bits"].value),
             "--enable-wrapper-rpath={0}".format("no" if "~wrapperrpath" in spec else "yes"),
         ]
+
 
         args.extend(self.enable_or_disable("alloca"))
         args.append("--with-pmi=" + spec.variants["pmi_version"].value)
@@ -309,4 +326,8 @@ class Mvapich(AutotoolsPackage):
         args.extend(self.process_manager_options)
         args.extend(self.network_options)
         args.extend(self.file_system_options)
+
+        if spec.satisfies("+pbs"):
+            args.append("--with-pbs={0}".format(spec["openpbs"].prefix))
+
         return args
