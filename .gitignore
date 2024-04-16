@@ -513,3 +513,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+############################
+# NCAR-specific ignores #
+############################
+
+bin/clean_bash
+share/ncar/
