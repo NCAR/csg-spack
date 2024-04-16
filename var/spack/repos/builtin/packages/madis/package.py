@@ -21,6 +21,7 @@ class Madis(MakefilePackage):
 
     maintainers("AlexanderRichert-NOAA")
 
+    version("4.5", sha256="66376c72ade6b06a5392ad8b4b7a338efbf4d82ff6f7f33648ca316738808e6f")
     version("4.3", sha256="5d1ee9800c84e623dcf4271653aa66d17a744143e58354e70f8a0646cd6b246c")
 
     variant("pic", default=True, description="Build with position-independent code (PIC)")

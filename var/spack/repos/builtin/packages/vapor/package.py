@@ -23,11 +23,8 @@ class Vapor(CMakePackage):
     maintainers("vanderwb")
 
     version("main", branch="main")
-    version(
-        "3.9.0",
-        sha256="343ababe40b5824ef826f16c935a6dc1fb18e1a4c88ef967c8d64386f28a99a3",
-        preferred=True,
-    )
+    version("3.9.1", sha256="5842bfd21e8e905e1acec35e8b86bc706a5a340eeee3530e07a20debe982ca31")
+    version("3.9.0", sha256="343ababe40b5824ef826f16c935a6dc1fb18e1a4c88ef967c8d64386f28a99a3")
 
     variant("doc", default=True, description="Build docs using Doxygen")
     variant("ospray", default=False, description="Enable OSPRay raytracing")

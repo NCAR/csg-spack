@@ -146,7 +146,6 @@ class Openssl(Package):  # Uses Fake Autotools, should subclass Package
     version(
         "1.1.1l",
         sha256="0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1",
-        deprecated=True,
     )
     version(
         "1.1.1k",
