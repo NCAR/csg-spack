@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -11,8 +11,8 @@ from spack.package import *
 class MpiSerial(AutotoolsPackage):
     """A single processor implementation of the mpi library."""
 
-    homepage = "https://github.com/MCSclimate/mpi-serial"
-    url = "https://github.com/MCSclimate/mpi-serial/archive/refs/tags/MPIserial_2.3.0.tar.gz"
+    homepage = "https://github.com/ESMCI/mpi-serial"
+    url = "https://github.com/ESMCI/mpi-serial/archive/refs/tags/MPIserial_2.3.0.tar.gz"
 
     # notify when the package is updated.
     maintainers("jedwards4b")
@@ -38,7 +38,7 @@ class MpiSerial(AutotoolsPackage):
 
     depends_on("autoconf", type="build", when="@2.5.0")
     depends_on("automake", type="build", when="@2.5.0")
-    depends_on("libtool",  type="build", when="@2.5.0")
+    depends_on("libtool", type="build", when="@2.5.0")
 
     def flag_handler(self, name, flags):
         spec = self.spec

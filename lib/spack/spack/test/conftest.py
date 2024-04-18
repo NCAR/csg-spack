@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -22,6 +22,7 @@ import xml.etree.ElementTree
 import py
 import pytest
 
+import archspec.cpu
 import archspec.cpu.microarchitecture
 import archspec.cpu.schema
 
@@ -44,6 +45,7 @@ import spack.package_prefs
 import spack.paths
 import spack.platforms
 import spack.repo
+import spack.solver.asp
 import spack.stage
 import spack.store
 import spack.subprocess_context
@@ -53,6 +55,7 @@ import spack.util.git
 import spack.util.gpg
 import spack.util.spack_yaml as syaml
 import spack.util.url as url_util
+import spack.version
 from spack.fetch_strategy import URLFetchStrategy
 from spack.util.pattern import Bunch
 
@@ -567,8 +570,8 @@ def mock_repo_path():
 def _pkg_install_fn(pkg, spec, prefix):
     # sanity_check_prefix requires something in the install directory
     mkdirp(prefix.bin)
-    if not os.path.exists(spec.package.build_log_path):
-        touchp(spec.package.build_log_path)
+    if not os.path.exists(spec.package.install_log_path):
+        touchp(spec.package.install_log_path)
 
 
 @pytest.fixture
@@ -709,7 +712,9 @@ def configuration_dir(tmpdir_factory, linux_os):
     t.write(content)
 
     compilers_yaml = test_config.join("compilers.yaml")
-    content = "".join(compilers_yaml.read()).format(linux_os)
+    content = "".join(compilers_yaml.read()).format(
+        linux_os=linux_os, target=str(archspec.cpu.host().family)
+    )
     t = tmpdir.join("site", "compilers.yaml")
     t.write(content)
     yield tmpdir
@@ -786,6 +791,7 @@ def no_compilers_yaml(mutable_config):
         compilers_yaml = os.path.join(local_config.path, "compilers.yaml")
         if os.path.exists(compilers_yaml):
             os.remove(compilers_yaml)
+    return mutable_config
 
 
 @pytest.fixture()
@@ -800,13 +806,13 @@ def mock_low_high_config(tmpdir):
 def _populate(mock_db):
     r"""Populate a mock database with packages.
 
-    Here is what the mock DB looks like:
+    Here is what the mock DB looks like (explicit roots at top):
 
-    o  mpileaks     o  mpileaks'    o  mpileaks''
-    |\              |\              |\
-    | o  callpath   | o  callpath'  | o  callpath''
-    |/|             |/|             |/|
-    o |  mpich      o |  mpich2     o |  zmpi
+    o  mpileaks     o  mpileaks'    o  mpileaks''     o externaltest     o trivial-smoke-test
+    |\              |\              |\                |
+    | o  callpath   | o  callpath'  | o  callpath''   o externaltool
+    |/|             |/|             |/|               |
+    o |  mpich      o |  mpich2     o |  zmpi         o externalvirtual
       |               |             o |  fake
       |               |               |
       |               |______________/
@@ -1435,6 +1441,15 @@ def mock_git_repository(git, tmpdir_factory):
     yield t
 
 
+@pytest.fixture(scope="function")
+def mock_git_test_package(mock_git_repository, mutable_mock_repo, monkeypatch):
+    # install a fake git version in the package class
+    pkg_class = spack.repo.PATH.get_pkg_class("git-test")
+    monkeypatch.delattr(pkg_class, "git")
+    monkeypatch.setitem(pkg_class.versions, spack.version.Version("git"), mock_git_repository.url)
+    return pkg_class
+
+
 @pytest.fixture(scope="session")
 def mock_hg_repository(tmpdir_factory):
     """Creates a very simple hg repository with two commits."""
@@ -1850,7 +1865,7 @@ def binary_with_rpaths(prefix_tmpdir):
     paths are encoded with `$ORIGIN` prepended.
     """
 
-    def _factory(rpaths, message="Hello world!"):
+    def _factory(rpaths, message="Hello world!", dynamic_linker="/lib64/ld-linux.so.2"):
         source = prefix_tmpdir.join("main.c")
         source.write(
             """
@@ -1866,10 +1881,10 @@ def binary_with_rpaths(prefix_tmpdir):
         executable = source.dirpath("main.x")
         # Encode relative RPATHs using `$ORIGIN` as the root prefix
         rpaths = [x if os.path.isabs(x) else os.path.join("$ORIGIN", x) for x in rpaths]
-        rpath_str = ":".join(rpaths)
         opts = [
             "-Wl,--disable-new-dtags",
-            "-Wl,-rpath={0}".format(rpath_str),
+            f"-Wl,-rpath={':'.join(rpaths)}",
+            f"-Wl,--dynamic-linker,{dynamic_linker}",
             str(source),
             "-o",
             str(executable),
@@ -1949,23 +1964,10 @@ def pytest_runtest_setup(item):
         pytest.skip(*not_on_windows_marker.args)
 
 
-class MockPool:
-    def map(self, func, args):
-        return [func(a) for a in args]
-
-    def starmap(self, func, args):
-        return [func(*a) for a in args]
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args):
-        pass
-
-
 @pytest.fixture(scope="function")
 def disable_parallel_buildcache_push(monkeypatch):
-    monkeypatch.setattr(spack.cmd.buildcache, "_make_pool", MockPool)
+    """Disable process pools in tests."""
+    monkeypatch.setattr(spack.cmd.buildcache, "_make_pool", spack.cmd.buildcache.NoPool)
 
 
 def _root_path(x, y, *, path):
@@ -1998,3 +2000,36 @@ repo:
             f.write(pkg_str)
 
     return spack.repo.Repo(repo_path)
+
+
+@pytest.fixture()
+def compiler_factory():
+    """Factory for a compiler dict, taking a spec and an OS as arguments."""
+
+    def _factory(*, spec, operating_system):
+        return {
+            "compiler": {
+                "spec": spec,
+                "operating_system": operating_system,
+                "paths": {"cc": "/path/to/cc", "cxx": "/path/to/cxx", "f77": None, "fc": None},
+                "modules": [],
+                "target": str(archspec.cpu.host().family),
+            }
+        }
+
+    return _factory
+
+
+@pytest.fixture()
+def host_architecture_str():
+    """Returns the broad architecture family (x86_64, aarch64, etc.)"""
+    return str(archspec.cpu.host().family)
+
+
+def _true(x):
+    return True
+
+
+@pytest.fixture()
+def do_not_check_runtimes_on_reuse(monkeypatch):
+    monkeypatch.setattr(spack.solver.asp, "_has_runtime_dependencies", _true)

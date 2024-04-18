@@ -1,4 +1,4 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
+# Copyright 2013-2024 Lawrence Livermore National Security, LLC and other
 # Spack Project Developers. See the top-level COPYRIGHT file for details.
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
@@ -90,8 +90,8 @@ class HdfEos5(AutotoolsPackage):
         # and we lose all nice flags from the Spack wrappers. These filter operations
         # allow use to use the Spack wrappers again.
         with keep_modification_time("configure"):
-            filter_file(r"$CC -show &> /dev/null", "true", "configure", string = True)
-            filter_file(r"CC=./$SZIP_CC", "", "configure", string = True)
+            filter_file(r"$CC -show &> /dev/null", "true", "configure", string=True)
+            filter_file(r"CC=./$SZIP_CC", "", "configure", string=True)
 
     def configure_args(self):
         extra_args = []
