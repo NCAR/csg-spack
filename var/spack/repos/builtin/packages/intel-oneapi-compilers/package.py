@@ -399,19 +399,19 @@ class IntelOneapiCompilers(IntelOneApiPackage):
 
     @classmethod
     def runtime_constraints(cls, *, spec, pkg):
-        pkg("*").depends_on(
-            "intel-oneapi-runtime",
-            when="%oneapi",
-            type="link",
-            description="If any package uses %oneapi, it depends on intel-oneapi-runtime",
-        )
-        pkg("*").depends_on(
-            f"intel-oneapi-runtime@{str(spec.version)}:",
-            when=f"%{str(spec)}",
-            type="link",
-            description=f"If any package uses %{str(spec)}, "
-            f"it depends on intel-oneapi-runtime@{str(spec.version)}:",
-        )
+        #pkg("*").depends_on(
+        #    "intel-oneapi-runtime",
+        #    when="%oneapi",
+        #    type="link",
+        #    description="If any package uses %oneapi, it depends on intel-oneapi-runtime",
+        #)
+        #pkg("*").depends_on(
+        #    f"intel-oneapi-runtime@{str(spec.version)}:",
+        #    when=f"%{str(spec)}",
+        #    type="link",
+        #    description=f"If any package uses %{str(spec)}, "
+        #    f"it depends on intel-oneapi-runtime@{str(spec.version)}:",
+        #)
 
         for fortran_virtual in ("fortran-rt", "libifcore@5"):
             pkg("*").depends_on(
@@ -423,4 +423,4 @@ class IntelOneapiCompilers(IntelOneApiPackage):
                 f"{str(spec)} and using the 'fortran' language",
             )
         # The version of gcc-runtime is the same as the %gcc used to "compile" it
-        pkg("intel-oneapi-runtime").requires(f"@={str(spec.version)}", when=f"%{str(spec)}")
+        #pkg("intel-oneapi-runtime").requires(f"@={str(spec.version)}", when=f"%{str(spec)}")

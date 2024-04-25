@@ -1156,19 +1156,19 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
             spec: spec that will inject runtime dependencies
             pkg: object used to forward information to the solver
         """
-        pkg("*").depends_on(
-            "gcc-runtime",
-            when="%gcc",
-            type="link",
-            description="If any package uses %gcc, it depends on gcc-runtime",
-        )
-        pkg("*").depends_on(
-            f"gcc-runtime@{str(spec.version)}:",
-            when=f"%{str(spec)}",
-            type="link",
-            description=f"If any package uses %{str(spec)}, "
-            f"it depends on gcc-runtime@{str(spec.version)}:",
-        )
+        #pkg("*").depends_on(
+        #    "gcc-runtime",
+        #    when="%gcc",
+        #    type="link",
+        #    description="If any package uses %gcc, it depends on gcc-runtime",
+        #)
+        #pkg("*").depends_on(
+        #    f"gcc-runtime@{str(spec.version)}:",
+        #    when=f"%{str(spec)}",
+        #    type="link",
+        #    description=f"If any package uses %{str(spec)}, "
+        #    f"it depends on gcc-runtime@{str(spec.version)}:",
+        #)
 
         gfortran_str = "libgfortran@5"
         if spec.satisfies("gcc@:6"):
@@ -1186,4 +1186,4 @@ class Gcc(AutotoolsPackage, GNUMirrorPackage):
                 f"{str(spec)} and using the 'fortran' language",
             )
         # The version of gcc-runtime is the same as the %gcc used to "compile" it
-        pkg("gcc-runtime").requires(f"@={str(spec.version)}", when=f"%{str(spec)}")
+        #pkg("gcc-runtime").requires(f"@={str(spec.version)}", when=f"%{str(spec)}")
