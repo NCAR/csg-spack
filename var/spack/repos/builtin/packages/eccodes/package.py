@@ -48,6 +48,7 @@ class Eccodes(CMakePackage):
     maintainers("skosukhin", "victoria-cherkas", "dominichofer", "climbfuji")
 
     version("develop", branch="develop")
+    version("2.36.0", sha256="da74143a64b2beea25ea27c63875bc8ec294e69e5bd0887802040eb04151d79a")
     version("2.32.0", sha256="b57e8eeb0eba0c05d66fda5527c4ffa84b5ab35c46bcbc9a2227142973ccb8e6")
     version("2.31.0", sha256="808ecd2c11fbf2c3f9fc7a36f8c2965b343f3151011b58a1d6e7cc2e6b3cac5d")
     version("2.25.0", sha256="8975131aac54d406e5457706fd4e6ba46a8cc9c7dd817a41f2aa64ce1193c04e")
@@ -108,7 +109,6 @@ class Eccodes(CMakePackage):
     depends_on("cmake@3.12:", when="@2.19:", type="build")
 
     depends_on("ecbuild", type="build", when="@develop")
-    depends_on("ecbuild@3.7:", type="build", when="@2.25:")
 
     conflicts("+openmp", when="+pthreads", msg="Cannot enable both POSIX threads and OMP")
 
