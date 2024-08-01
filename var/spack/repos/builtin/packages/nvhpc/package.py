@@ -1,10 +1,3 @@
-# Copyright 2013-2023 Lawrence Livermore National Security, LLC and other
-# Spack Project Developers. See the top-level COPYRIGHT file for details.
-#
-# SPDX-License-Identifier: (Apache-2.0 OR MIT)
-#
-# Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
-
 import platform
 
 from spack.package import *
@@ -21,6 +14,12 @@ from spack.util.prefix import Prefix
 #  - package key must be in the form '{os}-{arch}' where 'os' is in the
 #    format returned by platform.system() and 'arch' by platform.machine()
 _versions = {
+    "24.7": {
+        "Linux-x86_64": (
+            "bf2094aa2fc5bdbcbf9bfa0fddc1cbed1bfa6e9342980649db2350d9f675f853",
+            "https://developer.download.nvidia.com/hpc-sdk/24.7/nvhpc_2024_247_Linux_x86_64_cuda_multi.tar.gz",
+        ),
+    },
     "24.3": {
         "Linux-x86_64": (
             "a9fe5ec878e9c4cc332de732c6739f97ac064ce76ad3d0af6d282658d27124cb",
