@@ -231,7 +231,7 @@ class IntelOneapiMkl(IntelOneApiLibraryPackage):
         # cmake for the library list and they have to be consistent.
         # https://github.com/spack/spack/pull/43673 for discussion
         if self.spec.satisfies("+gfortran"):
-            depends_on("fortran", type="build")
+            #depends_on("fortran", type="build")
             libs.append(self._xlp64_lib("libmkl_gf"))
         else:
             libs.append(self._xlp64_lib("libmkl_intel"))
