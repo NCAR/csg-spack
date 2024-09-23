@@ -12,10 +12,9 @@ from spack.package import *
 
 
 class Openssl(Package):  # Uses Fake Autotools, should subclass Package
-    """OpenSSL is an open source project that provides a robust,
-    commercial-grade, and full-featured toolkit for the Transport
-    Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
-    It is also a general-purpose cryptography library."""
+    """OpenSSL is an open source project that provides a robust, commercial-grade, and
+    full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL)
+    protocols. It is also a general-purpose cryptography library."""
 
     homepage = "https://www.openssl.org"
 
@@ -32,80 +31,32 @@ class Openssl(Package):  # Uses Fake Autotools, should subclass Package
 
     license("Apache-2.0")
 
-    version("3.2.1", sha256="83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39")
-    version("3.1.5", sha256="6ae015467dabf0469b139ada93319327be24b98251ffaeceda0221848dc09262")
-    version("3.0.13", sha256="88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313")
+    version("3.3.1", sha256="777cd596284c883375a2a7a11bf5d2786fc5413255efab20c50d6ffe6d020b7e")
+    version("3.2.2", sha256="197149c18d9e9f292c43f0400acaba12e5f52cacfe050f3d199277ea738ec2e7")
+    version("3.1.6", sha256="5d2be4036b478ef3cb0a854ca9b353072c3a0e26d8a56f8f0ab9fb6ed32d38d7")
+    version("3.0.14", sha256="eeca035d4dd4e84fc25846d952da6297484afa0650a6f84c682e39df3a4123ca")
 
     version(
-        "3.1.3",
-        sha256="f0316a2ebd89e7f2352976445458689f80302093788c466692fb2a188b2eacf6",
+        "3.3.0",
+        sha256="53e66b043322a606abf0087e7699a0e033a37fa13feb9742df35c3a33b18fb02",
         deprecated=True,
     )
     version(
-        "3.1.2",
-        sha256="a0ce69b8b97ea6a35b96875235aa453b966ba3cba8af2de23657d8b6767d6539",
+        "3.2.1",
+        sha256="83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39",
         deprecated=True,
     )
     version(
-        "3.1.1",
-        sha256="b3aa61334233b852b63ddb048df181177c2c659eb9d4376008118f9c08d07674",
+        "3.1.5",
+        sha256="6ae015467dabf0469b139ada93319327be24b98251ffaeceda0221848dc09262",
         deprecated=True,
     )
     version(
-        "3.1.0",
-        sha256="aaa925ad9828745c4cad9d9efeb273deca820f2cdcf2c3ac7d7c1212b7c497b4",
+        "3.0.13",
+        sha256="88525753f79d3bec27d2fa7c66aa0b92b3aa9498dafd93d7cfa4b3780cdae313",
         deprecated=True,
     )
-    version(
-        "3.0.11",
-        sha256="b3425d3bb4a2218d0697eb41f7fc0cdede016ed19ca49d168b78e8d947887f55",
-        deprecated=True,
-    )
-    version(
-        "3.0.10",
-        sha256="1761d4f5b13a1028b9b6f3d4b8e17feb0cedc9370f6afe61d7193d2cdce83323",
-        deprecated=True,
-    )
-    version(
-        "3.0.9",
-        sha256="eb1ab04781474360f77c318ab89d8c5a03abc38e63d65a603cabbf1b00a1dc90",
-        deprecated=True,
-    )
-    version(
-        "3.0.8",
-        sha256="6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e",
-        deprecated=True,
-    )
-    version(
-        "3.0.7",
-        sha256="83049d042a260e696f62406ac5c08bf706fd84383f945cf21bd61e9ed95c396e",
-        deprecated=True,
-    )
-    version(
-        "3.0.5",
-        sha256="aa7d8d9bef71ad6525c55ba11e5f4397889ce49c2c9349dcea6d3e4f0b024a7a",
-        deprecated=True,
-    )
-    version(
-        "3.0.4",
-        sha256="2831843e9a668a0ab478e7020ad63d2d65e51f72977472dc73efcefbafc0c00f",
-        deprecated=True,
-    )
-    version(
-        "3.0.2",
-        sha256="98e91ccead4d4756ae3c9cde5e09191a8e586d9f4d50838e7ec09d6411dfdb63",
-        deprecated=True,
-    )
-    version(
-        "3.0.1",
-        sha256="c311ad853353bce796edad01a862c50a8a587f62e7e2100ef465ab53ec9b06d1",
-        deprecated=True,
-    )
-    version(
-        "3.0.0",
-        sha256="59eedfcb46c25214c9bd37ed6078297b4df01d012267fe9e9eee31f61bc70536",
-        deprecated=True,
-    )
+
     version(
         "1.1.1w",
         sha256="cf3098950cb4d853ad95c0841f1f9c6d3dc102dccfcacd521d93925208b76ac8",
@@ -265,106 +216,8 @@ class Openssl(Package):  # Uses Fake Autotools, should subclass Package
         sha256="ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16",
         deprecated=True,
     )
-    version(
-        "1.0.2t",
-        sha256="14cb464efe7ac6b54799b34456bd69558a749a4931ecfd9cf9f71d7881cac7bc",
-        deprecated=True,
-    )
-    version(
-        "1.0.2s",
-        sha256="cabd5c9492825ce5bd23f3c3aeed6a97f8142f606d893df216411f07d1abab96",
-        deprecated=True,
-    )
-    version(
-        "1.0.2r",
-        sha256="ae51d08bba8a83958e894946f15303ff894d75c2b8bbd44a852b64e3fe11d0d6",
-        deprecated=True,
-    )
-    version(
-        "1.0.2p",
-        sha256="50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00",
-        deprecated=True,
-    )
-    version(
-        "1.0.2o",
-        sha256="ec3f5c9714ba0fd45cb4e087301eb1336c317e0d20b575a125050470e8089e4d",
-        deprecated=True,
-    )
-    version(
-        "1.0.2n",
-        sha256="370babb75f278c39e0c50e8c4e7493bc0f18db6867478341a832a982fd15a8fe",
-        deprecated=True,
-    )
-    version(
-        "1.0.2m",
-        sha256="8c6ff15ec6b319b50788f42c7abc2890c08ba5a1cdcd3810eb9092deada37b0f",
-        deprecated=True,
-    )
-    version(
-        "1.0.2k",
-        sha256="6b3977c61f2aedf0f96367dcfb5c6e578cf37e7b8d913b4ecb6643c3cb88d8c0",
-        deprecated=True,
-    )
-    version(
-        "1.0.2j",
-        sha256="e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431",
-        deprecated=True,
-    )
-    version(
-        "1.0.2i",
-        sha256="9287487d11c9545b6efb287cdb70535d4e9b284dd10d51441d9b9963d000de6f",
-        deprecated=True,
-    )
-    version(
-        "1.0.2h",
-        sha256="1d4007e53aad94a5b2002fe045ee7bb0b3d98f1a47f8b2bc851dcd1c74332919",
-        deprecated=True,
-    )
-    version(
-        "1.0.2g",
-        sha256="b784b1b3907ce39abf4098702dade6365522a253ad1552e267a9a0e89594aa33",
-        deprecated=True,
-    )
-    version(
-        "1.0.2f",
-        sha256="932b4ee4def2b434f85435d9e3e19ca8ba99ce9a065a61524b429a9d5e9b2e9c",
-        deprecated=True,
-    )
-    version(
-        "1.0.2e",
-        sha256="e23ccafdb75cfcde782da0151731aa2185195ac745eea3846133f2e05c0e0bff",
-        deprecated=True,
-    )
-    version(
-        "1.0.2d",
-        sha256="671c36487785628a703374c652ad2cebea45fa920ae5681515df25d9f2c9a8c8",
-        deprecated=True,
-    )
-    version(
-        "1.0.1u",
-        sha256="4312b4ca1215b6f2c97007503d80db80d5157f76f8f7d3febbe6b4c56ff26739",
-        deprecated=True,
-    )
-    version(
-        "1.0.1t",
-        sha256="4a6ee491a2fdb22e519c76fdc2a628bb3cec12762cd456861d207996c8a07088",
-        deprecated=True,
-    )
-    version(
-        "1.0.1r",
-        sha256="784bd8d355ed01ce98b812f873f8b2313da61df7c7b5677fcf2e57b0863a3346",
-        deprecated=True,
-    )
-    version(
-        "1.0.1h",
-        sha256="9d1c8a9836aa63e2c6adb684186cbd4371c9e9dcc01d6e3bb447abf2d4d3d093",
-        deprecated=True,
-    )
-    version(
-        "1.0.1e",
-        sha256="f74f15e8c8ff11aa3d5bb5f276d202ec18d7246e95f961db76054199c69c1ae3",
-        deprecated=True,
-    )
+
+    depends_on("c", type="build")  # generated
 
     # On Cray DVS mounts, we can't make symlinks to /etc/ssl/openssl.cnf,
     # either due to a bug or because DVS is not intended to be POSIX compliant.
@@ -375,12 +228,10 @@ class Openssl(Package):  # Uses Fake Autotools, should subclass Package
         values=("mozilla", "system", "none"),
         multi=False,
         description=(
-            "Use certificates from the ca-certificates-mozilla "
-            "package, symlink system certificates, or use none, "
-            "respectively. The default is `mozilla`, since it is "
-            "system agnostic. Instead of picking certs=system, "
-            "one can mark openssl as an external package, to "
-            "avoid compiling openssl entirely."
+            "Use certificates from the ca-certificates-mozilla package, symlink system "
+            "certificates, or use none, respectively. The default is `mozilla`, since it is "
+            "system agnostic. Instead of picking certs=system, one can mark openssl as an "
+            "external package, to avoid compiling openssl entirely."
         ),
     )
     variant("docs", default=False, description="Install docs and manpages")
@@ -394,14 +245,7 @@ class Openssl(Package):  # Uses Fake Autotools, should subclass Package
     depends_on("nasm", when="platform=windows")
 
     depends_on("gmake", type="build", when="platform=linux")
-    depends_on("gmake", type="build", when="platform=cray")
     depends_on("gmake", type="build", when="platform=darwin")
-
-    patch(
-        "https://github.com/openssl/openssl/commit/f9e578e720bb35228948564192adbe3bc503d5fb.patch?full_index=1",
-        sha256="3fdcf2d1e47c34f3a012f23306322c5a35cad55b180c9b6fb34537b55884645c",
-        when="@1.1.1q",
-    )
 
     @classmethod
     def determine_version(cls, exe):
