@@ -95,7 +95,8 @@ class LinaroForge(Package):
         )
     elif platform.machine() == "x86_64":
         version(
-            "24.1p1", sha256="8618692325d4cc079e99ca8a75d7b16a99482ae4c11bc935cf6e53aa8ee48835"
+            "24.1p1", sha256="8618692325d4cc079e99ca8a75d7b16a99482ae4c11bc935cf6e53aa8ee48835",
+            url="https://downloads.linaroforge.com/24.1-preview1-4750b7c73b2d/linaro-forge-24.1-linux-x86_64.tar"
         )
         version(
             "24.0.4", sha256="001e7b7cd796d8e807971b99a9ca233c24f8fcd6eee4e9b4bbb0ec8560d44f08"
