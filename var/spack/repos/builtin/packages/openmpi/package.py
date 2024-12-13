@@ -44,24 +44,15 @@ class Openmpi(AutotoolsPackage, CudaPackage):
 
     version("main", branch="main", submodules=True)
 
-    version(
-        "5.0.0",
-        sha256="9d845ca94bc1aeb445f83d98d238cd08f6ec7ad0f73b0f79ec1668dbfdacd613",
-    )
-
-    # Beta
-    version(
-        "5.0.0rc16",
-        sha256="cb1ad777c2a29142e3751279f3da6ddb2d5b2da32059bdda125e0b02d90992f8",
-        deprecated=True,
-    )
-
     # Current
+    version(
+        "5.0.6", sha256="bd4183fcbc43477c254799b429df1a6e576c042e74a2d2f8b37d537b2ff98157"
+    )  # libmpi.so.40.40.6
+
+    # Still supported
     version(
         "5.0.5", sha256="6588d57c0a4bd299a24103f4e196051b29e8b55fbda49e11d5b3d32030a32776"
     )  # libmpi.so.40.40.5
-
-    # Still supported
     version(
         "5.0.4", sha256="64526852cdd88b2d30e022087c16ab3e03806c451b10cd691d5c1ac887d8ef9d"
     )  # libmpi.so.40.40.4
