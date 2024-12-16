@@ -8,8 +8,20 @@ import platform
 
 from spack.build_environment import dso_suffix
 from spack.package import *
+from spack.util.environment import EnvironmentModifications
 
 versions = [
+    {
+        "version": "2025.0.3",
+        "cpp": {
+            "url": "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/1cac4f39-2032-4aa9-86d7-e4f3e40e4277/intel-dpcpp-cpp-compiler-2025.0.3.9_offline.sh",
+            "sha256": "0ca834002b9091dc9988da6798a2eb36ebc5933d8d523ed0fa78a55744c88823",
+        },
+        "ftn": {
+            "url": "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/fafa2df1-4bb1-43f7-87c6-3c82f1bdc712/intel-fortran-compiler-2025.0.3.9_offline.sh",
+            "sha256": "1ad813cf6495ded730646d6c4fd065dcc840875fdea28fcc6bac2cafb8d22c8d",
+        },
+    },
     {
         "version": "2025.0.1",
         "cpp": {
@@ -384,6 +396,14 @@ class IntelOneapiCompilers(IntelOneApiPackage, CompilerPackage):
         and from setting CC/CXX/F77/FC
         """
         super().setup_run_environment(env)
+
+        # umf is packaged with compiler and not available as a standalone
+        if "~envmods" not in self.spec and self.spec.satisfies("@2025:"):
+            env.extend(
+                EnvironmentModifications.from_sourcing_file(
+                    self.prefix.umf.latest.env.join("vars.sh"), *self.env_script_args
+                )
+            )
 
         env.set("CC", self._llvm_bin.icx)
         env.set("CXX", self._llvm_bin.icpx)
