@@ -25,6 +25,10 @@ class Ncarcompilers(MakefilePackage):
     version('0.7.1', sha256='88f23f89841b6e49a44b66d3a6afb3d8d817f51103cc07f3c8c48864a0215405')
 
     def setup_build_environment(self, env):
+        # The real compilers need to be in the PATH, because Spack wrappers don't always map
+        # I.e. ifort is missing for oneapi
+        env.append_path("PATH", ancestor(self.compiler.cc))
+
         # Make sure traditional intel compilers are in the path too
         with when('%oneapi'):
             env.append_path("PATH", join_path(ancestor(self.compiler.cc), 'intel64'))
