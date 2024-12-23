@@ -17,9 +17,21 @@ class Spherepack(Package):
 
     depends_on("fortran", type="build")
 
+    def flag_handler(self, name, flags):
+        spec = self.spec
+
+        if name == "fflags":
+            flags.append("-O2")
+
+            if spec.satisfies("%gcc"):
+                flags.append("-fallow-argument-mismatch")
+
+        return (flags, None, None)
+
     def install(self, spec, prefix):
         if self.compiler.fc is None:
             raise InstallError("SPHEREPACK requires a Fortran 90 compiler")
-        make("MAKE=make", "F90=f90 -O2 -fallow-argument-mismatch", "AR=ar", "libspherepack")
-        make("MAKE=make", "F90=f90 -O2 -fallow-argument-mismatch", "AR=ar", "testspherepack")
+
+        make("MAKE=make", "F90={}".format(spack_fc), "AR=ar", "libspherepack")
+        make("MAKE=make", "F90={}".format(spack_fc), "AR=ar", "testspherepack")
         install_tree("lib", prefix.lib)
