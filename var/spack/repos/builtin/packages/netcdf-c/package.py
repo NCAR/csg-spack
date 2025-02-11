@@ -28,6 +28,7 @@ class NetcdfC(CMakePackage, AutotoolsPackage):
     license("BSD-3-Clause")
 
     version("main", branch="main")
+    version("4.9.3", sha256="990f46d49525d6ab5dc4249f8684c6deeaf54de6fec63a187e9fb382cc0ffdff")
     version("4.9.2", sha256="bc104d101278c68b303359b3dc4192f81592ae8640f1aee486921138f7f88cb7")
     version("4.9.0", sha256="9f4cb864f3ab54adb75409984c6202323d2fc66c003e5308f3cdf224ed41c0a6")
     version("4.8.1", sha256="bc018cc30d5da402622bf76462480664c6668b55eb16ba205a0dfb8647161dd0")
@@ -60,6 +61,7 @@ class NetcdfC(CMakePackage, AutotoolsPackage):
         #  with the following patch:
         patch("4.8.1-win-hdf5-with-zlib.patch", when="@4.8.1: platform=windows")
 
+    with when("@:4.9.2 build_system=cmake"):
         # TODO: https://github.com/Unidata/netcdf-c/pull/2595 contains some of the changes
         # made in this patch but is not sufficent to replace the patch. There is currently
         # no upstream PR (or set of PRs) covering all changes in this path.
@@ -342,6 +344,16 @@ class CMakeBuilder(AnyBuilder, cmake.CMakeBuilder):
             self.define("ENABLE_LARGE_FILE_SUPPORT", True),
             self.define_from_variant("NETCDF_ENABLE_LOGGING", "logging"),
         ]
+        if self.pkg.spec.satisfies("@:4.9.2"):
+            base_cmake_args.extend([
+                    self.define("ENABLE_NETCDF_4", True),
+                    self.define_from_variant("ENABLE_DAP", "dap")
+            ])
+        else:
+            base_cmake_args.extend([
+                    self.define("NETCDF_ENABLE_NETCDF_4", True),
+                    self.define_from_variant("NETCDF_ENABLE_DAP", "dap")
+            ])
         if "+parallel-netcdf" in self.pkg.spec:
             base_cmake_args.append(self.define("ENABLE_PNETCDF", True))
         if self.pkg.spec.satisfies("@4.3.1:"):

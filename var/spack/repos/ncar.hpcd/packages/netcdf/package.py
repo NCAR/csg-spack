@@ -15,7 +15,8 @@ class Netcdf(BundlePackage):
     homepage = "https://www.unidata.ucar.edu/software/netcdf"
 
     maintainers = ['vanderwb']
-    
+
+    version('4.9.3')
     version('4.9.2')
     version('4.9.1')
     version('4.9.0')
@@ -40,6 +41,7 @@ class Netcdf(BundlePackage):
     depends_on('netcdf-fortran')
     depends_on('netcdf-cxx4')
 
+    depends_on('netcdf-c@4.9.3', when='@4.9.3')
     depends_on('netcdf-c@4.9.2', when='@4.9.2')
     depends_on('netcdf-c@4.9.1', when='@4.9.1')
     depends_on('netcdf-c@4.9.0', when='@4.9.0')
